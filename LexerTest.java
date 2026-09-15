@@ -59,4 +59,19 @@ public class LexerTest {
 
         assertEquals(new Token("EOF", "EOF"), lexer.next());
     }
+
+    /**
+     * @throws SyntaxException
+     * 
+     */
+    @Test
+    public void testMultiDigit() throws SyntaxException{
+
+        String prg = "42";
+        Lexer lexer = new Lexer(prg);
+
+        assertEquals(new Token("num", "42") lexer.next())
+        assertEquals(new Token("EOF", "EOF") lexer.next())
+
+    }
 }

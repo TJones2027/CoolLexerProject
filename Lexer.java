@@ -13,6 +13,7 @@ public class Lexer {
 
     private Set<String> whitespace = new HashSet<>();
     private Set<String> letters = new HashSet<>();
+    private Set<String> digits = new HashSet<>();
     private Set<String> keywords = new HashSet<>();
 
 
@@ -27,6 +28,7 @@ public class Lexer {
         initWhitespace(whitespace);
         initLetters(letters);
         initKeywords(keywords);
+        initDigits(digits);
     }
 
     private void initKeywords(Set<String> keywords2) {
@@ -36,6 +38,11 @@ public class Lexer {
     private void initLetters(Set<String> s) {
         fill(s, 'A', 'Z');
         fill(s, 'a', 'z');
+    }
+
+    private void initDigits(Set<String> s){
+        fill(s, '0', '9');
+
     }
 
     private void fill(Set<String> s, char lo, char hi) {
@@ -79,6 +86,19 @@ public class Lexer {
             return new Token("id", lexeme);
     }
 
+    private Token nextNumber(){
+        int old = this.position;
+        advance();
+
+        while (hasChar() && digits.contains(peek())) {
+            advance();
+        }
+
+        String lexeme = program.substring(old, position);
+        return new Token("num", lexeme);
+
+    }
+
 
     /**
      * Determines the kind of the next token (e.g., "id") and calls the
@@ -96,7 +116,12 @@ public class Lexer {
             return new Token("EOF");
         } else if (hasChar() && letters.contains(peek())) {
             return nextKwID();
+        } 
+        else if (hasChar() && digits.contains(peek())){
+            return nextNumber();
         }
+
+
         //	rest here!
         else {
             System.err.println("illegal character at position "+ position);
@@ -121,4 +146,6 @@ public class Lexer {
     public int getPosition() {
         return position;
     }
+
+    
 }
