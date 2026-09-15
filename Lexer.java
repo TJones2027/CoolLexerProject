@@ -15,6 +15,7 @@ public class Lexer {
     private Set<String> letters = new HashSet<>();
     private Set<String> digits = new HashSet<>();
     private Set<String> keywords = new HashSet<>();
+    private Set<String> operator = new HashSet<>();
 
 
     /**
@@ -29,20 +30,31 @@ public class Lexer {
         initLetters(letters);
         initKeywords(keywords);
         initDigits(digits);
+        initOperator(operator);
     }
 
     private void initKeywords(Set<String> keywords2) {
         //.... no keywords yet
     }
-
+    //defines letters available
     private void initLetters(Set<String> s) {
         fill(s, 'A', 'Z');
         fill(s, 'a', 'z');
     }
-
+    //defines valid digits
     private void initDigits(Set<String> s){
         fill(s, '0', '9');
-
+    }
+    //defines operators
+    private void initOperator(Set<String> s){
+        s.add( ")" );
+        s.add( "(" );
+        s.add( "=" );
+        s.add( ";" );
+        s.add( "/" );
+        s.add( "*" );
+        s.add( "-" );
+        s.add( "+" );
     }
 
     private void fill(Set<String> s, char lo, char hi) {
@@ -50,16 +62,19 @@ public class Lexer {
             s.add(c + "");
         }
     }
-
+    //defines whitespace
     private void initWhitespace(Set<String> s) {
         s.add(" ");
         s.add("\n");
         s.add("\t");
+        s.add("\r");
     }
+
 
     private void advance() {
         this.position++;
     }
+
 
     private String peek() {
         if (hasChar()) {
@@ -69,14 +84,21 @@ public class Lexer {
         }
     }
 
+
+/**
+ * checks if token is an id 
+ * 
+ * @return scanned token
+ */
     private Token nextKwID() {
 
         int old = this.position;
         advance();
 
-        while (hasChar() && letters.contains(peek())) {
-            advance();
-        }
+// checks for letters followed by numbers to output token as an id
+    while (hasChar() && (letters.contains(peek()) || digits.contains(peek()))) {
+        advance();
+    }
 
         String lexeme = program.substring(old, position);
 
@@ -86,19 +108,41 @@ public class Lexer {
             return new Token("id", lexeme);
     }
 
-    private Token nextNumber(){
-        int old = this.position;
-        advance();
+/**
+ * Checks if next token is a number including .digit || digit
+ * 
+ * @return scanned token
+ */
+private Token nextNumber(){
+    int old = this.position;
 
+    while (hasChar() && digits.contains(peek())) {
+        advance();
+    }
+
+    if (hasChar() && ".".equals(peek())) {
+        advance();
         while (hasChar() && digits.contains(peek())) {
             advance();
         }
-
-        String lexeme = program.substring(old, position);
-        return new Token("num", lexeme);
-
     }
 
+    String lexeme = program.substring(old, position);
+    return new Token("num", lexeme);
+}
+
+/**
+ * Determines if next token is an operator
+ * 
+ * @return the scanned token
+ * 
+ */
+private Token nextOperator(){
+    int old = this.position;
+    advance();
+    String lexeme = program.substring(old, position);
+    return new Token(lexeme);
+}
 
     /**
      * Determines the kind of the next token (e.g., "id") and calls the
@@ -114,13 +158,21 @@ public class Lexer {
 
         if (!hasChar()) {
             return new Token("EOF");
-        } else if (hasChar() && letters.contains(peek())) {
+        } 
+        else if (hasChar() && letters.contains(peek())) {
             return nextKwID();
         } 
         else if (hasChar() && digits.contains(peek())){
             return nextNumber();
         }
-
+        else if (hasChar() && operator.contains(peek())){
+            return nextOperator();
+        }
+        else if (hasChar() && ".".equals(peek()) 
+            && position + 1 < program.length() 
+            && digits.contains(program.charAt(position + 1) + "")) {
+        return nextNumber();
+}
 
         //	rest here!
         else {
