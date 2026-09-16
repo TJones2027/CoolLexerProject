@@ -121,15 +121,17 @@ private void skipComment() {
  * 
  * @return scanned token
  */
-private Token nextNumber(){
+private Token nextNumber() {
     int old = this.position;
 
+    // Consume initial digits
     while (hasChar() && digits.contains(peek())) {
         advance();
     }
 
+    // Handle decimal point
     if (hasChar() && ".".equals(peek())) {
-        advance();
+        advance(); // consume '.'
         while (hasChar() && digits.contains(peek())) {
             advance();
         }
@@ -170,7 +172,7 @@ private Token nextOperator(){
         else if (hasChar() && letters.contains(peek())) {
             return nextKwID();
         } 
-        else if (hasChar() && digits.contains(peek())){
+        else if (hasChar() && (digits.contains(peek()) || ".".equals(peek()))) {
             return nextNumber();
         }
         //checks for start of comment
