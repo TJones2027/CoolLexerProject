@@ -85,6 +85,14 @@ public class Lexer {
     }
 
 
+//checks for comments and skips
+private void skipComment() {
+    while (hasChar() && !"\n".equals(peek())) {
+        advance();
+    }
+}
+
+
 /**
  * checks if token is an id 
  * 
@@ -165,6 +173,14 @@ private Token nextOperator(){
         else if (hasChar() && digits.contains(peek())){
             return nextNumber();
         }
+        //checks for start of comment
+        else if (hasChar() && "/".equals(peek())
+        && position + 1 < program.length()
+        && "/".equals(program.charAt(position + 1) + "")) {
+        skipComment();
+        return next();
+        }
+        //checks for next operator
         else if (hasChar() && operator.contains(peek())){
             return nextOperator();
         }
@@ -172,7 +188,7 @@ private Token nextOperator(){
             && position + 1 < program.length() 
             && digits.contains(program.charAt(position + 1) + "")) {
         return nextNumber();
-}
+        }
 
         //	rest here!
         else {
