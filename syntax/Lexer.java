@@ -7,8 +7,8 @@ import java.util.*;
  */
 public class Lexer {
 
-    private String program;      // source program being interpreted
-    private int position;        // index of next char in program
+    private String program;
+    private int position;
 
 
     private Set<String> whitespace = new HashSet<>();
@@ -121,15 +121,17 @@ private void skipComment() {
  * 
  * @return scanned token
  */
-private Token nextNumber(){
+private Token nextNumber() {
     int old = this.position;
 
+    // Consume initial digits
     while (hasChar() && digits.contains(peek())) {
         advance();
     }
 
+    // Handle decimal point
     if (hasChar() && ".".equals(peek())) {
-        advance();
+        advance(); // consume '.'
         while (hasChar() && digits.contains(peek())) {
             advance();
         }
@@ -170,7 +172,7 @@ private Token nextOperator(){
         else if (hasChar() && letters.contains(peek())) {
             return nextKwID();
         } 
-        else if (hasChar() && digits.contains(peek())){
+        else if (hasChar() && (digits.contains(peek()) || ".".equals(peek()))) {
             return nextNumber();
         }
         //checks for start of comment

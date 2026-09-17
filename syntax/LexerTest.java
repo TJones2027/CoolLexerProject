@@ -65,7 +65,7 @@ public class LexerTest {
      * 
      */
     @Test
-    public void testMultiDigit() throws SyntaxException{
+    public void testMultiNum() throws SyntaxException{
 
         String prg = "42";
         Lexer lexer = new Lexer(prg);
@@ -158,11 +158,11 @@ public class LexerTest {
     }
 
     /**
-     * Tests that identifiers can contain embedded digits (not just start with letters)
+     * Tests that identifiers can contain embedded numbers (not just start with letters)
      * @throws SyntaxException
      */
     @Test
-    public void testIdWithDigits() throws SyntaxException {
+    public void testIdWithNums() throws SyntaxException {
         Lexer lexer = new Lexer("move2Up");
         assertEquals(new Token("id", "move2Up"), lexer.next());
         assertEquals(new Token("EOF", "EOF"), lexer.next());
@@ -237,11 +237,11 @@ public class LexerTest {
     }
 
     /**
-     * Tests that a single slash (not a double slash) is still scanned as division
+     * Tests that a single slash is still scanned as division and not thrown an error or counted as a comment
      * @throws SyntaxException
      */
     @Test
-    public void testLoneSlashIsDivision() throws SyntaxException {
+    public void testDivOp() throws SyntaxException {
         Lexer lexer = new Lexer("6/2");
         assertEquals(new Token("num", "6"), lexer.next());
         assertEquals(new Token("/", "/"), lexer.next());
