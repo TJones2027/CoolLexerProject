@@ -1,8 +1,6 @@
 package node;
 
-/**
- * TODO:
- */
+
 public class Expr extends Node {
 
     protected Term term;
@@ -21,15 +19,14 @@ public class Expr extends Node {
         this.expr = null;
     }
 
-
     public void append(Expr expr) {
-        if (this.expr==null)
+        if (this.expr == null) 
         {
-            this.addop=expr.addop;
-            this.expr=expr;
-            expr.addop=null;
-        }
-        else
+            this.addop = expr.addop;
+            this.expr = expr;
+            expr.addop = null;
+        } 
+        else 
         {
             this.expr.append(expr);
         }

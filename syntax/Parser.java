@@ -51,31 +51,44 @@ public class Parser {
      * @return
      * @throws SyntaxException
      */
-    private Term parseTerm() throws SyntaxException {
+ private Term parseTerm() throws SyntaxException {
 
+    Fact fact = parseFact();
+    Mulop mulop = parseMulop();
+
+    if (mulop == null) {
+        return new Term(fact);
+    } else {
+        Term term = parseTerm();
+        term.append(new Term(fact, mulop, null));
+        return term;
     }
+}
 
     /**
      * TODO
      * @return
      * @throws SyntaxException
      */
-    private Fact parseFact() throws SyntaxException {
+private Fact parseFact() throws SyntaxException {
 
-        Token current = lookahead;
+    Token current = lookahead;
 
-        if (current.equalType(new Token("id"))) {
-            match("id");
-            //TODO: return a new node.Fact Subclass for this case
+    if (current.equalType(new Token("id"))) {
+        match("id");
+        return new FactId(lexer.getPosition(), current);
 
-        } else if (current.equalType(new Token("num"))) {
+    } else if (current.equalType(new Token("num"))) {
+        match("num");
+        return new FactNum(lexer.getPosition(), current);
 
-            //TODO: What tokens to match and what to return?
-        } else {
-
-            //TODO: What tokens to match and what to return?
-        }
+    } else {
+        match("(");
+        Expr expr = parseExpr();
+        match(")");
+        return new FactExpr(lexer.getPosition(), expr);
     }
+}
 
     /**
      * Parses an Addop nonterminal and returns it.
@@ -102,9 +115,20 @@ public class Parser {
      * @return
      * @throws SyntaxException
      */
-    private Mulop parseMulop() throws SyntaxException {
+private Mulop parseMulop() throws SyntaxException {
+    Token mulop = lookahead;
+    if (mulop.equalType("*")) {
+        match("*");
+        return new Mulop(lexer.getPosition(), mulop);
 
+    } else if (mulop.equalType("/")) {
+        match("/");
+        return new Mulop(lexer.getPosition(), mulop);
+
+    } else {
+        return null;
     }
+}
 
     private void match(String s) throws SyntaxException {
         if (lookahead.equalType(s)) {
