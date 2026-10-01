@@ -57,7 +57,7 @@ void testSubtractionChain() throws SyntaxException {
     Parser parser = new Parser();
     String prg = "10 - 4 - 3";
 
-    // Matches the third sample tree from the assignment sheet exactly
+
     System.out.println(parser.parse(prg).toString());
 }
 

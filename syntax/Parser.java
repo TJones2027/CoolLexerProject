@@ -26,9 +26,7 @@ public class Parser {
         return expr;
     }
 
-    /**
-     * TODO
-     *
+    /**     *
      * @return
      * @throws SyntaxException
      */
@@ -47,7 +45,7 @@ public class Parser {
     }
 
     /**
-     * TODO
+     * Parses a Term nonterminal and returns it.
      * @return
      * @throws SyntaxException
      */
@@ -66,7 +64,7 @@ public class Parser {
 }
 
     /**
-     * TODO
+     * Parses a Fact nonterminal and returns it
      * @return
      * @throws SyntaxException
      */
@@ -111,7 +109,7 @@ private Fact parseFact() throws SyntaxException {
     }
 
     /**
-     * TODO
+     * Parses a Mulop nonterminal and returns it.
      * @return
      * @throws SyntaxException
      */
