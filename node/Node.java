@@ -1,5 +1,7 @@
 package node;
 
+import eval.Environment;
+import eval.EvalException;
 import java.lang.reflect.Field;
 
 /**
@@ -44,4 +46,9 @@ public abstract class Node {
 
         return result.toString();
     }
+
+        public double eval(Environment env) throws EvalException {
+        throw new EvalException(position, "cannot eval() node!");
+    }
+
 }

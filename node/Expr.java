@@ -1,5 +1,8 @@
 package node;
 
+import eval.Environment;
+import eval.EvalException;
+
 
 public class Expr extends Node {
 
@@ -26,9 +29,17 @@ public class Expr extends Node {
             this.expr = expr;
             expr.addop = null;
         } 
-        else 
-        {
+        else{
             this.expr.append(expr);
         }
     }
+
+    @Override
+    public double eval(Environment env) throws EvalException {
+        if (expr == null) {
+            return term.eval(env);
+        }
+        return addop.compute(expr.eval(env), term.eval(env));
+    }
+
 }

@@ -7,16 +7,14 @@ import java.util.*;
  */
 public class Lexer {
 
-    private String program;
-    private int position;
-
+    private String program;      // source program being interpreted
+    private int position;        // index of next char in program
 
     private Set<String> whitespace = new HashSet<>();
     private Set<String> letters = new HashSet<>();
     private Set<String> digits = new HashSet<>();
     private Set<String> keywords = new HashSet<>();
     private Set<String> operator = new HashSet<>();
-
 
     /**
      * Creates a new lexical analyzer
@@ -33,28 +31,32 @@ public class Lexer {
         initOperator(operator);
     }
 
-    private void initKeywords(Set<String> keywords2) {
-        //.... no keywords yet
+    // defines keywords
+    private void initKeywords(Set<String> s) {
+        s.add("wr");
     }
-    //defines letters available
+
+    // defines letters available
     private void initLetters(Set<String> s) {
         fill(s, 'A', 'Z');
         fill(s, 'a', 'z');
     }
-    //defines valid digits
-    private void initDigits(Set<String> s){
+
+    // defines valid digits
+    private void initDigits(Set<String> s) {
         fill(s, '0', '9');
     }
-    //defines operators
-    private void initOperator(Set<String> s){
-        s.add( ")" );
-        s.add( "(" );
-        s.add( "=" );
-        s.add( ";" );
-        s.add( "/" );
-        s.add( "*" );
-        s.add( "-" );
-        s.add( "+" );
+
+    // defines operators
+    private void initOperator(Set<String> s) {
+        s.add(")");
+        s.add("(");
+        s.add("=");
+        s.add(";");
+        s.add("/");
+        s.add("*");
+        s.add("-");
+        s.add("+");
     }
 
     private void fill(Set<String> s, char lo, char hi) {
@@ -62,7 +64,8 @@ public class Lexer {
             s.add(c + "");
         }
     }
-    //defines whitespace
+
+    // defines whitespace
     private void initWhitespace(Set<String> s) {
         s.add(" ");
         s.add("\n");
@@ -70,11 +73,9 @@ public class Lexer {
         s.add("\r");
     }
 
-
     private void advance() {
         this.position++;
     }
-
 
     private String peek() {
         if (hasChar()) {
@@ -84,29 +85,26 @@ public class Lexer {
         }
     }
 
-
-//checks for comments and skips
-private void skipComment() {
-    while (hasChar() && !"\n".equals(peek())) {
-        advance();
+    // skips a comment up to (not including) the end of the line
+    private void skipComment() {
+        while (hasChar() && !"\n".equals(peek())) {
+            advance();
+        }
     }
-}
 
-
-/**
- * checks if token is an id 
- * 
- * @return scanned token
- */
+    /**
+     * Scans a keyword or an id (a letter followed by letters or digits)
+     *
+     * @return scanned token
+     */
     private Token nextKwID() {
 
         int old = this.position;
         advance();
 
-// checks for letters followed by numbers to output token as an id
-    while (hasChar() && (letters.contains(peek()) || digits.contains(peek()))) {
-        advance();
-    }
+        while (hasChar() && (letters.contains(peek()) || digits.contains(peek()))) {
+            advance();
+        }
 
         String lexeme = program.substring(old, position);
 
@@ -116,43 +114,42 @@ private void skipComment() {
             return new Token("id", lexeme);
     }
 
-/**
- * Checks if next token is a number including .digit || digit
- * 
- * @return scanned token
- */
-private Token nextNumber() {
-    int old = this.position;
+    /**
+     * Scans a number, including forms like 5, 5.25 and .5
+     *
+     * @return scanned token
+     */
+    private Token nextNumber() {
+        int old = this.position;
 
-    // Consume initial digits
-    while (hasChar() && digits.contains(peek())) {
-        advance();
-    }
-
-    // Handle decimal point
-    if (hasChar() && ".".equals(peek())) {
-        advance(); // consume '.'
+        // consume initial digits
         while (hasChar() && digits.contains(peek())) {
             advance();
         }
+
+        // handle decimal point
+        if (hasChar() && ".".equals(peek())) {
+            advance();
+            while (hasChar() && digits.contains(peek())) {
+                advance();
+            }
+        }
+
+        String lexeme = program.substring(old, position);
+        return new Token("num", lexeme);
     }
 
-    String lexeme = program.substring(old, position);
-    return new Token("num", lexeme);
-}
-
-/**
- * Determines if next token is an operator
- * 
- * @return the scanned token
- * 
- */
-private Token nextOperator(){
-    int old = this.position;
-    advance();
-    String lexeme = program.substring(old, position);
-    return new Token(lexeme);
-}
+    /**
+     * Scans a single-character operator
+     *
+     * @return the scanned token
+     */
+    private Token nextOperator() {
+        int old = this.position;
+        advance();
+        String lexeme = program.substring(old, position);
+        return new Token(lexeme);
+    }
 
     /**
      * Determines the kind of the next token (e.g., "id") and calls the
@@ -168,33 +165,31 @@ private Token nextOperator(){
 
         if (!hasChar()) {
             return new Token("EOF");
-        } 
-        else if (hasChar() && letters.contains(peek())) {
+        }
+        else if (letters.contains(peek())) {
             return nextKwID();
-        } 
-        else if (hasChar() && (digits.contains(peek()) || ".".equals(peek()))) {
+        }
+        else if (digits.contains(peek())) {
             return nextNumber();
         }
-        //checks for start of comment
-        else if (hasChar() && "/".equals(peek())
-        && position + 1 < program.length()
-        && "/".equals(program.charAt(position + 1) + "")) {
-        skipComment();
-        return next();
+        // a '.' only starts a number if a digit follows it (e.g. .5)
+        else if (".".equals(peek())
+                && position + 1 < program.length()
+                && digits.contains(program.charAt(position + 1) + "")) {
+            return nextNumber();
         }
-        //checks for next operator
-        else if (hasChar() && operator.contains(peek())){
+        // "//" starts a comment; this check must come before the operator check
+        else if ("/".equals(peek())
+                && position + 1 < program.length()
+                && "/".equals(program.charAt(position + 1) + "")) {
+            skipComment();
+            return next();
+        }
+        else if (operator.contains(peek())) {
             return nextOperator();
         }
-        else if (hasChar() && ".".equals(peek()) 
-            && position + 1 < program.length() 
-            && digits.contains(program.charAt(position + 1) + "")) {
-        return nextNumber();
-        }
-
-        //	rest here!
         else {
-            System.err.println("illegal character at position "+ position);
+            System.err.println("illegal character at position " + position);
             position++;
             return next();
         }
@@ -216,6 +211,4 @@ private Token nextOperator(){
     public int getPosition() {
         return position;
     }
-
-    
 }

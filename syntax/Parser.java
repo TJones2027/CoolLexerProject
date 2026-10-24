@@ -21,9 +21,9 @@ public class Parser {
     public Node parse(String program) throws SyntaxException {
         lexer = new Lexer(program);
         lookahead = lexer.next(); //"prime the pump"
-        Expr expr = parseExpr();
+        Block block = parseBlock();
         match("EOF");
-        return expr;
+        return block;
     }
 
     /**     *
@@ -76,17 +76,25 @@ private Fact parseFact() throws SyntaxException {
         match("id");
         return new FactId(lexer.getPosition(), current);
 
-    } else if (current.equalType(new Token("num"))) {
+    }
+    else if (current.equalType(new Token("num"))) {
         match("num");
         return new FactNum(lexer.getPosition(), current);
 
-    } else {
+    }
+    else if (current.equalType(new Token("-"))) {
+        match("-");
+        Fact fact = parseFact();
+        return new FactNeg(lexer.getPosition(), fact);
+
+    } 
+    else{
         match("(");
         Expr expr = parseExpr();
         match(")");
         return new FactExpr(lexer.getPosition(), expr);
+ }
     }
-}
 
     /**
      * Parses an Addop nonterminal and returns it.
@@ -99,11 +107,13 @@ private Fact parseFact() throws SyntaxException {
             match("+");
             return new Addop(lexer.getPosition(), addop);
 
-        } else if (addop.equalType("-")) {
+        }
+        else if (addop.equalType("-")) {
             match("-");
             return new Addop(lexer.getPosition(), addop);
 
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -119,20 +129,79 @@ private Mulop parseMulop() throws SyntaxException {
         match("*");
         return new Mulop(lexer.getPosition(), mulop);
 
-    } else if (mulop.equalType("/")) {
+    }
+    else if (mulop.equalType("/")) {
         match("/");
         return new Mulop(lexer.getPosition(), mulop);
 
-    } else {
-        return null;
     }
-}
+        else {
+            return null;
+        }
+    }
 
     private void match(String s) throws SyntaxException {
         if (lookahead.equalType(s)) {
             lookahead = lexer.next();
-        } else {
+        }
+        else {
             throw new SyntaxException(lexer.getPosition(), new Token(s), lookahead);
         }
+    }
+
+    /**
+    * Parses a Block nonterminal: stmt ';' block | stmt
+    * @return a Block node
+    * @throws SyntaxException if an invalid terminal is discovered
+    */
+    private Block parseBlock() throws SyntaxException {
+    Stmt stmt = parseStmt();
+
+    if (lookahead.equalType(";")) {
+        match(";");
+        Block block = parseBlock();
+        return new Block(lexer.getPosition(), stmt, block);
+    }
+    else{
+            return new Block(lexer.getPosition(), stmt);
+        }
+    }
+
+/**
+ * Parses a Stmt nonterminal: assn | 'wr' expr
+ * @return an Assn or Wr node
+ * @throws SyntaxException if an invalid terminal is discovered
+ */
+private Stmt parseStmt() throws SyntaxException {
+    if (lookahead.equalType("id")) {
+        return parseAssn();
+    } 
+    else{
+        return parseWr();   // match("wr") throws if this isn't a wr
+    }
+}
+
+    /**
+    * Parses an Assn nonterminal: id '=' expr
+    * @return an Assn node
+    * @throws SyntaxException if an invalid terminal is discovered
+    */
+    private Assn parseAssn() throws SyntaxException {
+        Token id = lookahead;
+        match("id");
+        match("=");
+        Expr expr = parseExpr();
+        return new Assn(lexer.getPosition(), id, expr);
+}
+
+    /**
+    * Parses a Wr statement: 'wr' expr
+    * @return a Wr node
+    * @throws SyntaxException if an invalid terminal is discovered
+    */
+    private Wr parseWr() throws SyntaxException {
+    match("wr");
+    Expr expr = parseExpr();
+    return new Wr(lexer.getPosition(), expr);
     }
 }

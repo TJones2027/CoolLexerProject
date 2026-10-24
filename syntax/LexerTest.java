@@ -248,4 +248,13 @@ public class LexerTest {
         assertEquals(new Token("num", "2"), lexer.next());
         assertEquals(new Token("EOF", "EOF"), lexer.next());
     }
+
+    @Test
+    public void testWrKeyword() throws SyntaxException {
+    Lexer lexer = new Lexer("wr x");
+    assertEquals(new Token("wr", "wr"), lexer.next());
+    assertEquals(new Token("id", "x"), lexer.next());
+    assertEquals(new Token("EOF", "EOF"), lexer.next());
+}
+
 }

@@ -18,6 +18,10 @@ As it always feels I had some trouble with using junit testing but after staring
 ### Part 2: Lexical Analysis
 This part of the project was pretty cool as I really have liked doing the tracing of the trees in our in class work so being able to put this into practice has been interesting. One day I may find out how to use junit correctly, for now I struggle. It was pretty hard to find time to do this project as I had to finish my scheme project as well as having 2 exams to study for so it was definitely brutal. I think i've completed all of the things needed though.
 
+
+### Part 3
+I felt after completing the other 2 parts a lot of this was just using info from previous parts to help complete the required sections. Such as statement being just an abstract class similar to fact. I actually planned ahead to get this done but doing some final checks never hurts. I struggled a little bit at first with trying to work out how to do addop and mulop using eval and but once I figured out what it did and how to do one of them the other felt easy enough to do
+
 ## Sources used
 
 https://docs.junit.org/current/user-guide/#running-tests-console-launcher
