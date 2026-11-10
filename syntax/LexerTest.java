@@ -257,4 +257,61 @@ public class LexerTest {
     assertEquals(new Token("EOF", "EOF"), lexer.next());
 }
 
+
+// Testing Relop
+@Test
+public void testRelops() throws SyntaxException {
+    Lexer lexer = new Lexer("< <= > >= <> ==");
+    assertEquals(new Token("<", "<"), lexer.next());
+    assertEquals(new Token("<=", "<="), lexer.next());
+    assertEquals(new Token(">", ">"), lexer.next());
+    assertEquals(new Token(">=", ">="), lexer.next());
+    assertEquals(new Token("<>", "<>"), lexer.next());
+    assertEquals(new Token("==", "=="), lexer.next());
+    assertEquals(new Token("EOF", "EOF"), lexer.next());
+}
+
+@Test
+public void testRelopWithoutSpaces() throws SyntaxException {
+    Lexer lexer = new Lexer("a<>b");
+    assertEquals(new Token("id", "a"), lexer.next());
+    assertEquals(new Token("<>", "<>"), lexer.next());
+    assertEquals(new Token("id", "b"), lexer.next());
+}
+
+@Test
+public void testAssignVersusEquals() throws SyntaxException {
+    Lexer lexer = new Lexer("a=b==c");
+    assertEquals(new Token("id", "a"), lexer.next());
+    assertEquals(new Token("=", "="), lexer.next());
+    assertEquals(new Token("id", "b"), lexer.next());
+    assertEquals(new Token("==", "=="), lexer.next());
+    assertEquals(new Token("id", "c"), lexer.next());
+}
+
+@Test
+public void testOperatorAtEnd() throws SyntaxException {
+    Lexer lexer = new Lexer("a<");
+    assertEquals(new Token("id", "a"), lexer.next());
+    assertEquals(new Token("<", "<"), lexer.next());
+    assertEquals(new Token("EOF", "EOF"), lexer.next());
+}
+
+@Test
+public void testNewKeywords() throws SyntaxException {
+    Lexer lexer = new Lexer("rd if then else while do begin end");
+    String[] words = {"rd", "if", "then", "else", "while", "do", "begin", "end"};
+    for (String w : words) {
+        assertEquals(new Token(w, w), lexer.next());
+    }
+    assertEquals(new Token("EOF", "EOF"), lexer.next());
+}
+
+@Test
+public void testKeywordPrefixIsId() throws SyntaxException {
+    Lexer lexer = new Lexer("done ending");
+    assertEquals(new Token("id", "done"), lexer.next());
+    assertEquals(new Token("id", "ending"), lexer.next());
+}
+
 }

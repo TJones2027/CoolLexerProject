@@ -33,7 +33,15 @@ public class Lexer {
 
     // defines keywords
     private void initKeywords(Set<String> s) {
-        s.add("wr");
+    s.add("wr");
+    s.add("rd");
+    s.add("if");
+    s.add("then");
+    s.add("else");
+    s.add("while");
+    s.add("do");
+    s.add("begin");
+    s.add("end");
     }
 
     // defines letters available
@@ -57,6 +65,8 @@ public class Lexer {
         s.add("*");
         s.add("-");
         s.add("+");
+        s.add("<");
+        s.add(">"); 
     }
 
     private void fill(Set<String> s, char lo, char hi) {
@@ -140,17 +150,27 @@ public class Lexer {
     }
 
     /**
-     * Scans a single-character operator
+     * Scans a single-character operator but reads next character in case of relop op
      *
      * @return the scanned token
      */
-    private Token nextOperator() {
-        int old = this.position;
-        advance();
-        String lexeme = program.substring(old, position);
-        return new Token(lexeme);
+private Token nextOperator() {
+    int old = this.position;
+    String first = peek();
+    advance();
+
+    String second = peek(); 
+    if (second != null) {
+        String two = first + second;
+        if (two.equals("<=") || two.equals(">=")
+                || two.equals("<>") || two.equals("==")) {
+            advance(); 
+        }
     }
 
+    String lexeme = program.substring(old, position);
+    return new Token(lexeme);
+}
     /**
      * Determines the kind of the next token (e.g., "id") and calls the
      * appropriate method to scan the token's lexeme (e.g., "foo").
