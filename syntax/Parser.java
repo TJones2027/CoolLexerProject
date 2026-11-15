@@ -176,8 +176,20 @@ private Stmt parseStmt() throws SyntaxException {
     if (lookahead.equalType("id")) {
         return parseAssn();
     } 
-    else{
-        return parseWr();   // match("wr") throws if this isn't a wr
+    else if (lookahead.equalType("rd")) {
+        return parseRd();
+    } 
+    else if (lookahead.equalType("if")) {
+        return parseIf();
+    } 
+    else if (lookahead.equalType("while")) {
+        return parseWhile();
+    } 
+    else if (lookahead.equalType("begin")) {
+        return parseBegin();
+    } 
+    else {
+        return parseWr();
     }
 }
 
@@ -204,4 +216,80 @@ private Stmt parseStmt() throws SyntaxException {
     Expr expr = parseExpr();
     return new Wr(lexer.getPosition(), expr);
     }
+
+    /**
+ * Parses an Rd statement: 'rd' id
+ */
+private Rd parseRd() throws SyntaxException {
+    match("rd");
+    Token id = lookahead;
+    match("id");
+    return new Rd(lexer.getPosition(), id);
+}
+
+/**
+ * Parses an If statement: 'if' boolexpr 'then' stmt ['else' stmt]
+ */
+private If parseIf() throws SyntaxException {
+    match("if");
+    BoolExpr cond = parseBoolExpr();
+    match("then");
+    Stmt thenStmt = parseStmt();
+
+    if (lookahead.equalType("else")) {
+        match("else");
+        Stmt elseStmt = parseStmt();
+        return new If(lexer.getPosition(), cond, thenStmt, elseStmt);
+    } else {
+        return new If(lexer.getPosition(), cond, thenStmt);
+    }
+}
+
+/**
+ * Parses a While statement: 'while' boolexpr 'do' stmt
+ */
+private While parseWhile() throws SyntaxException {
+    match("while");
+    BoolExpr cond = parseBoolExpr();
+    match("do");
+    Stmt body = parseStmt();
+    return new While(lexer.getPosition(), cond, body);
+}
+
+/**
+ * Parses a Begin statement: 'begin' block 'end'
+ */
+private Begin parseBegin() throws SyntaxException {
+    match("begin");
+    Block block = parseBlock();
+    match("end");
+    return new Begin(lexer.getPosition(), block);
+}
+
+/**
+ * Parses a BoolExpr nonterminal: expr relop expr
+ */
+private BoolExpr parseBoolExpr() throws SyntaxException {
+    Expr left = parseExpr();
+    Relop relop = parseRelop();
+    Expr right = parseExpr();
+    return new BoolExpr(lexer.getPosition(), left, relop, right);
+}
+
+/**
+ * Parses a Relop nonterminal: < | <= | > | >= | <> | ==
+ * @throws SyntaxException if the current token is not a relational operator
+ */
+private Relop parseRelop() throws SyntaxException {
+    Token relop = lookahead;
+    if (relop.equalType("<") || relop.equalType("<=")
+            || relop.equalType(">") || relop.equalType(">=")
+            || relop.equalType("<>") || relop.equalType("==")) {
+        match(relop.getLexeme());
+        return new Relop(lexer.getPosition(), relop);
+    } else {
+        throw new SyntaxException(lexer.getPosition(), new Token("relop"), lookahead);
+    }
+}
+
 }

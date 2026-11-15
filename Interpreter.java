@@ -6,6 +6,8 @@ import syntax.SyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import node.Rd;
+
 /*
  * A simple REPL for the interpreter
  */
@@ -23,15 +25,21 @@ public class Interpreter {
         /*
          * begin interactive interpreter
          */
-        java.util.Scanner scan = new java.util.Scanner(System.in);
+        java.util.Scanner scan = Rd.getScanner();
 
         System.out.print(PROMPT);
 
         String line;
         while (scan.hasNext()) {
 
+            //uses rd instead of java scanne
             try {
                 line = scan.nextLine();
+                    if (line.trim().isEmpty()) {
+                System.out.print(PROMPT);
+                continue;
+                }
+
                 switch (line) {
                     case EXIT_CMD:
                         System.out.println("Goodbye!"); //TODO, add you own comment!

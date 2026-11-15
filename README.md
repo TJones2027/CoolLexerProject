@@ -22,6 +22,9 @@ This part of the project was pretty cool as I really have liked doing the tracin
 ### Part 3
 I felt after completing the other 2 parts a lot of this was just using info from previous parts to help complete the required sections. Such as statement being just an abstract class similar to fact. I actually planned ahead to get this done but doing some final checks never hurts. I struggled a little bit at first with trying to work out how to do addop and mulop using eval and but once I figured out what it did and how to do one of them the other felt easy enough to do
 
+### Part 4
+This part was very similar to the last which made it a lot easier to implement. As well as some of the hints given in the IA part 4 document being very usefull in the context of what we did last time and how some of the items needed to be implemented this time. I didn't struggle with much this time, just in general the idea of rd and how to implement it as its own file as well as implementing it into the project as a whole
+
 ## Sources used
 
 https://docs.junit.org/current/user-guide/#running-tests-console-launcher

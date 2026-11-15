@@ -16,7 +16,7 @@ public class Rd extends Stmt {
     private static InputStream source;
 
     // One Scanner shared by every Rd node
-    private static Scanner getScanner() {
+    public static Scanner getScanner() {
         if (scanner == null || source != System.in) {
             source = System.in;
             scanner = new Scanner(source);
